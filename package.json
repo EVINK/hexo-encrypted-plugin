@@ -1,0 +1,14 @@
+{
+  "name": "hexo-encrypted-plugin",
+  "version": "0.0.1",
+  "description": "A Hexo plugin can encrypted your acticles easily",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Hexo", "Encrypted"
+  ],
+  "author": "EvinK",
+  "license": "MIT"
+}
