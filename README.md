@@ -1,3 +1,5 @@
+English | [中文](https://github.com/EVINK/hexo-encrypted-plugin/blob/main/README.zh-CN.md)
+
 Add a lock for your Hexo article.
 
 ## Easy to use
@@ -22,6 +24,8 @@ password: 123456
 ```
 
 3. Done.
+
+[Click here](https://code.evink.cn/2023/03/post/an-article-with-password/) to see the presentation(password: 1234)
 
 Oh wait, if you'd like to customize your own unlock style and logic
 
