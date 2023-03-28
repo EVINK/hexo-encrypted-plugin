@@ -216,6 +216,14 @@ function _defaultModel() {
         position: relative;
         top: -1rem;
         height: 2rem;
+        color: #696969;
+        margin-left: 0;
+        font-weight: 300;
+        line-height: 35px;
+        margin-bottom: 20px;
+        font-size: 26px;
+        transition: color .3s;
+        margin-bottom: 10px;
     }
 
 
