@@ -53,6 +53,8 @@ function genAES() {
 
 hexo.extend.filter.register('after_post_render', (p) => {
     if (!p.password) return p
+    p.authstring = p.password
+    delete p.password
 
     let pages = hexo.locals.get('pages')
     pages = pages.map(v => v.path)
@@ -89,8 +91,8 @@ hexo.extend.filter.register('after_post_render', (p) => {
     const data = fs.readFileSync(_file)
     const _key = genNewSalt(p.title)
     const _iv = genNewSalt(p.title, true)
-    const authString = (p.password + _key).slice(0, 32)
-    const iv = (_iv + p.password).split("")
+    const authString = (p.authstring + _key).slice(0, 32)
+    const iv = (_iv + p.authstring).split("")
         .reverse().join("").slice(0, 16)
 
     genAES()
