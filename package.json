@@ -1,6 +1,6 @@
 {
   "name": "hexo-encrypted-plugin",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "A Hexo plugin can encrypted your acticles easily",
   "main": "index.js",
   "scripts": {
