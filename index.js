@@ -20,7 +20,7 @@ function genRandomString(length) {
 
 function genRandomStringBaseOnTime(length) {
     const now = new Date()
-    return `${now.getDate().toString(36)}${(now.getMonth() + 1).toString(36)}${now.getMilliseconds().toString(36)}${now.getHours().toString(16)}.${genRandomString(length)}.${now.getFullYear().toString(16)}${now.getSeconds().toString(26)}${now.getMinutes().toString(26)}`
+    return `${now.getDate().toString(36)}${(now.getMonth() + 1).toString(36)}${now.getMilliseconds().toString(36)}${now.getHours().toString(16)}_${genRandomString(length)}_${now.getFullYear().toString(16)}${now.getSeconds().toString(26)}${now.getMinutes().toString(26)}`
 }
 
 function genNewSalt(title, iv) {
