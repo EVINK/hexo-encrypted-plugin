@@ -18,6 +18,11 @@ function genRandomString(length) {
     return result
 }
 
+function genRandomStringBaseOnTime(length) {
+    const now = new Date()
+    return `${now.getDate().toString(36)}${(now.getMonth() + 1).toString(36)}${now.getMilliseconds().toString(36)}${now.getHours().toString(16)}.${genRandomString(length)}.${now.getFullYear().toString(16)}${now.getSeconds().toString(26)}${now.getMinutes().toString(26)}`
+}
+
 function genNewSalt(title, iv) {
     const folderName = 'public/@encrypted/'
     if (!fs.existsSync(folderName)) {
@@ -81,14 +86,19 @@ hexo.extend.filter.register('after_post_render', (p) => {
 
     let authContent = 'THIS PAGE IS GENERATED AUTOMATICALLY'
     if (model === '@encrypted') {
-        authContent = _defaultModel()
+        authContent = _defaultModel(genRandomStringBaseOnTime(6))
     }
     const _file = _dir + '/index.html'
     const _fileExsist = fs.existsSync(_file)
     if (!_fileExsist) fs.writeFileSync(_file, authContent)
 
     // 读取文件
-    const data = fs.readFileSync(_file)
+    let data
+    if (model === '@encrypted') {
+        data = authContent
+    } else {
+         data = fs.readFileSync(_file)
+    }
     const _key = genNewSalt(p.title)
     const _iv = genNewSalt(p.title, true)
     const authString = (p.authstring + _key).slice(0, 32)
@@ -104,7 +114,7 @@ hexo.extend.filter.register('after_post_render', (p) => {
 }, 9)
 
 
-function _defaultModel() {
+function _defaultModel( randomStr ) {
     return `
 <style>
     .auth-root {
@@ -147,12 +157,10 @@ function _defaultModel() {
     }
 
     .hexo-auth-string {
-        border-bottom: 1px solid #d8d8d8;
         transition: 1s;
     }
 
     .hexo-auth-string.red {
-        border-color: red;
         animation: shake .3s ease-in-out;
     }
 
@@ -280,7 +288,7 @@ function _defaultModel() {
 
 </style>
 
-<div class="auth-root">
+<div class="auth-root" title="${ randomStr }">
     <div class="auth-wrapper">
         <div class="authBox makeElementMiddle">
             <div class="makeElementMiddle">
@@ -300,7 +308,7 @@ function _defaultModel() {
                     <input class="hexo-auth-string" type="password" placeholder="输入解锁码"/>
                 </div>
                 <div class="btn">
-                    <input class="greenBtn" type="button" value="解锁" onclick="unlock(event)" />
+                    <input class="greenBtn" type="button" value="解锁" onclick="unlock_${ randomStr }(event)" />
                 </div>
             </div>
         </div>
@@ -316,17 +324,17 @@ function _defaultModel() {
 
 <script>
 
-    function errorHint(passwordInput, msg) {
-        passwordInput.classList.add('red')
-        passwordInput.value = ''
-        passwordInput.placeholder = msg
-        setTimeout(() => {
-            passwordInput.classList.remove('red')
-        }, 1000)
-    }
+    async function unlock_${ randomStr }(event) {
 
+        function errorHint(passwordInput, msg) {
+            passwordInput.classList.add('red')
+            passwordInput.value = ''
+            passwordInput.placeholder = msg
+            setTimeout(() => {
+                passwordInput.classList.remove('red')
+            }, 1000)
+        }
 
-    async function unlock(event) {
         const target = event.target
         const root = target.parentElement.parentElement.parentElement.parentElement.parentElement
 
@@ -387,9 +395,8 @@ function _defaultModel() {
     }
 
     (function () {
-        const root = document.currentScript.previousElementSibling
-
-        if (root.className !== 'auth-root') throw new Error('无法找到Auth Root')
+        const root = document.querySelector('.auth-root[title="${ randomStr }"]')
+        if (!root) throw new Error('无法找到Auth Root')
         const passwordInput = root.querySelector('.hexo-auth-string')
 
         const _i = setInterval(() => {
