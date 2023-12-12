@@ -237,25 +237,25 @@ function _defaultModel( randomStr ) {
     }
 
 
-    svg {
+    .HEP-SVG {
         width: 200px;
         height: 200px;
         margin: 2.5rem auto;
     }
 
-    svg.unlock-icon {
+    .HEP-SVG.unlock-icon {
         display: none;
     }
 
-    svg.lock-icon {
+    .HEP-SVG.lock-icon {
         width: 2rem;
         height: 2rem;
         margin-right: .3rem;
     }
 
-    path,
-    circle,
-    rect {
+    .HEP-SVG path,
+    .HEP-SVG circle,
+    .HEP-SVG rect {
         stroke: #23ad4f;
         stroke-width: 1;
         stroke-linecap: round;
@@ -263,15 +263,15 @@ function _defaultModel( randomStr ) {
         stroke-dasharray: 70;
     }
 
-    svg.lock-icon path,
-    svg.lock-icon circle,
-    svg.lock-icon rect {
+    .HEP-SVG.lock-icon path,
+    .HEP-SVG.lock-icon circle,
+    .HEP-SVG.lock-icon rect {
         stroke: darkgray;
     }
 
-    svg.unlock-icon path,
-    svg.unlock-icon circle,
-    svg.unlock-icon rect {
+    .HEP-SVG.unlock-icon path,
+    .HEP-SVG.unlock-icon circle,
+    .HEP-SVG.unlock-icon rect {
         stroke-dashoffset: 70;
         animation: unlock 1s ease-in-out forwards;
     }
@@ -293,7 +293,7 @@ function _defaultModel( randomStr ) {
         <div class="authBox makeElementMiddle">
             <div class="makeElementMiddle">
                 <h1 class="article-title">
-                    <svg class="lock-icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                    <svg class="HEP-SVG lock-icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
                         viewBox="0 0 24 24">
                         <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                             stroke-linejoin="round">
@@ -312,7 +312,7 @@ function _defaultModel( randomStr ) {
                 </div>
             </div>
         </div>
-        <svg class="unlock-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <svg class="HEP-SVG unlock-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
             <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="5" y="11" width="14" height="10" rx="2"></rect>
                 <circle cx="12" cy="16" r="1"></circle>
