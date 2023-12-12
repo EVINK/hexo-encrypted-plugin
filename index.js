@@ -42,6 +42,7 @@ function genNewSalt(title, iv) {
     data[title] = value
     data = JSON.stringify(data)
     fs.writeFileSync(fileName, data)
+    // console.log('data', data)
 
     return value
 }
@@ -59,21 +60,38 @@ function genAES() {
 }
 
 
-hexo.extend.filter.register('before_generate', function () {
-    // remove stuffs
-    fs.rm(encryptFolder, { recursive: true, force: true })
-    fs.rm('source/@encrypted', { recursive: true, force: true })
+hexo.extend.filter.register('after_init', () => {
+    if (!fs.existsSync('db.json')) return
+    let data = fs.readFileSync('db.json', { encoding: 'utf8' })
+    data = JSON.parse(data)
+    const posts = data['models']['Post']
 
+    for (i = 0; i < posts.length; i++) {
+        const p = posts[i]
+        if (!p) continue
+        if (!p.password && !p.authstring) continue
+        if (p._content) {
+            p.content = p._content
+        }
 
-    const posts = hexo.locals.get('posts')
-    posts.forEach(main)
+        // console.log('p content', p.content)
+        // hexo.post.render(p.path, p)
+        data['models']['Post'][i] = main(p)
+    }
+
+    fs.writeFileSync('db.json', JSON.stringify(data))
+})
+
+hexo.extend.filter.register('after_post_render', p => {
+    return main(p)
 }, 9)
 
-hexo.extend.filter.register('after_post_render', main, 9)
-
-function main (p) {
-    if (!p.password) return p
-    p.authstring = p.password
+function main(p) {
+    if (!p.password && !p.authstring) return p
+    // console.log('p', p.title, p.authstring)
+    if (p.password) {
+        p.authstring = p.password
+    }
     delete p.password
 
     let pages = hexo.locals.get('pages')
@@ -101,24 +119,37 @@ function main (p) {
 
     let authContent = 'THIS PAGE IS GENERATED AUTOMATICALLY'
     if (model === '@encrypted') {
-        authContent = _defaultModel(genRandomStringBaseOnTime(6))
+        const random = genRandomStringBaseOnTime(6)
+        // console.log('random', random)
+        authContent = _defaultModel(random)
     }
     const _file = _dir + '/index.html'
-    const _fileExsist = fs.existsSync(_file)
-    if (!_fileExsist) fs.writeFileSync(_file, authContent)
+    // const _fileExsist = fs.existsSync(_file)
+    // if (!_fileExsist) fs.writeFileSync(_file, authContent)
+    // console.log('file path', _file)
+
+    fs.rmSync(_file, { recursive: true, force: true })
+    fs.writeFileSync(_file, authContent)
 
     // 读取文件
     let data
     if (model === '@encrypted') {
         data = authContent
     } else {
-         data = fs.readFileSync(_file)
+        data = fs.readFileSync(_file)
     }
     const _key = genNewSalt(p.title)
     const _iv = genNewSalt(p.title, true)
     const authString = (p.authstring + _key).slice(0, 32)
     const iv = (_iv + p.authstring).split("")
         .reverse().join("").slice(0, 16)
+
+    // console.log('data', authString, iv)
+    // 保存当前版本content
+    p._content = p.content
+    if (!p.content) p._content = 'No data yet, this message generated automatically.'
+    // console.log('content', p.content)
+
 
     genAES()
     const aesEle = `<script src="/@encrypted/aes.js"></script>`
@@ -129,7 +160,7 @@ function main (p) {
 }
 
 
-function _defaultModel( randomStr ) {
+function _defaultModel(randomStr) {
     return `
 <style>
     .auth-root {
@@ -303,7 +334,7 @@ function _defaultModel( randomStr ) {
 
 </style>
 
-<div class="auth-root" title="${ randomStr }">
+<div class="auth-root" title="${randomStr}">
     <div class="auth-wrapper">
         <div class="authBox makeElementMiddle">
             <div class="makeElementMiddle">
@@ -323,7 +354,7 @@ function _defaultModel( randomStr ) {
                     <input class="hexo-auth-string" type="password" placeholder="输入解锁码"/>
                 </div>
                 <div class="btn">
-                    <input class="greenBtn" type="button" value="解锁" onclick="unlock_${ randomStr }(event)" />
+                    <input class="greenBtn" type="button" value="解锁" onclick="unlock_${randomStr}(event)" />
                 </div>
             </div>
         </div>
@@ -339,7 +370,7 @@ function _defaultModel( randomStr ) {
 
 <script>
 
-    async function unlock_${ randomStr }(event) {
+    async function unlock_${randomStr}(event) {
 
         function errorHint(passwordInput, msg) {
             passwordInput.classList.add('red')
@@ -410,7 +441,7 @@ function _defaultModel( randomStr ) {
     }
 
     (function () {
-        const root = document.querySelector('.auth-root[title="${ randomStr }"]')
+        const root = document.querySelector('.auth-root[title="${randomStr}"]')
         if (!root) throw new Error('无法找到Auth Root')
         const passwordInput = root.querySelector('.hexo-auth-string')
 
