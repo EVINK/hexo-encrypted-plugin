@@ -1,6 +1,8 @@
 const crypto = require('crypto')
 const fs = require('fs')
 
+const encryptFolder = 'public/@encrypted/'
+
 function aesCBCEncrypt(data, key, iv) {
     const cipher = crypto.createCipheriv('aes-256-cbc', key, iv)
     let crypted = cipher.update(data, 'utf8', 'hex')
@@ -24,7 +26,7 @@ function genRandomStringBaseOnTime(length) {
 }
 
 function genNewSalt(title, iv) {
-    const folderName = 'public/@encrypted/'
+    const folderName = encryptFolder
     if (!fs.existsSync(folderName)) {
         fs.mkdirSync(folderName)
     }
@@ -45,7 +47,7 @@ function genNewSalt(title, iv) {
 }
 
 function genAES() {
-    const folderName = 'public/@encrypted/'
+    const folderName = encryptFolder
     if (!fs.existsSync(folderName)) {
         fs.mkdirSync(folderName)
     }
@@ -56,7 +58,20 @@ function genAES() {
     }
 }
 
-hexo.extend.filter.register('after_post_render', (p) => {
+
+hexo.extend.filter.register('before_generate', function () {
+    // remove stuffs
+    fs.rm(encryptFolder, { recursive: true, force: true })
+    fs.rm('source/@encrypted', { recursive: true, force: true })
+
+
+    const posts = hexo.locals.get('posts')
+    posts.forEach(main)
+}, 9)
+
+hexo.extend.filter.register('after_post_render', main, 9)
+
+function main (p) {
     if (!p.password) return p
     p.authstring = p.password
     delete p.password
@@ -111,7 +126,7 @@ hexo.extend.filter.register('after_post_render', (p) => {
     ${aesCBCEncrypt(`${authString + p.content}`, authString, iv)}
     </div>`
     return p
-}, 9)
+}
 
 
 function _defaultModel( randomStr ) {
