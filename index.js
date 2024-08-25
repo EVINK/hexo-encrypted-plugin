@@ -27,6 +27,9 @@ function genRandomStringBaseOnTime(length) {
 
 function genNewSalt(title, iv) {
     const folderName = encryptFolder
+    if (!fs.existsSync('public/')) {
+        fs.mkdirSync('public/')
+    }
     if (!fs.existsSync(folderName)) {
         fs.mkdirSync(folderName)
     }
